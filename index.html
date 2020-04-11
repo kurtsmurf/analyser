@@ -5,46 +5,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>analyser</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #analyser {
+      border: 10px solid black;
+    }
+  </style>
 </head>
 
 <body>
   <canvas id='analyser'></canvas>
-  <script>
-    const ac = new AudioContext()
-    const b = ac.createBufferSource()
-    const a = ac.createAnalyser()
-    const d = new Uint8Array(900)
-
-    b.connect(a).connect(ac.destination)
-
-    const c = document.getElementById('analyser')
-    const r = c.getContext('2d')
-
-    c.width = window.innerWidth
-    c.height = window.innerHeight / 2
-
-    const draw = () => {
-      r.clearRect(0,0,c.width,c.height)
-
-      a.getByteFrequencyData(d)
-
-      d.forEach((v, i) => {
-        r.fillRect((i/d.length)*c.width, c.height - v - 4, 4,4)
-      })
-
-      requestAnimationFrame(draw)
-    }
-
-    fetch('mk_drmz.wav')
-    .then(response => response.arrayBuffer())
-    .then(arrayBuffer => ac.decodeAudioData(arrayBuffer))
-    .then(audioBuffer => {
-      b.buffer = audioBuffer
-      b.loop = true
-      b.start()
-      draw()
-    })
-  </script>
 </body>
 
 </html>
+
+<script>
+  const ac = new AudioContext()
+  const b = ac.createBufferSource()
+  const a = ac.createAnalyser()
+
+  b.connect(a).connect(ac.destination)
+
+  const c = document.getElementById('analyser')
+  const r = c.getContext('2d')
+
+  const binCount = 32
+  const scale = 10
+
+  c.width = binCount * scale
+  c.height = 32 * scale
+
+  r.scale(scale,scale)
+
+  const getBins = () => {
+    const bins = new Uint8Array(binCount)
+    const binWidth = a.frequencyBinCount / binCount
+    const data = new Uint8Array(a.frequencyBinCount)
+
+    a.getByteFrequencyData(data)
+
+    bins.forEach((_, i) => {
+      bins[i] = Math.floor(data[binWidth * i] / 8)
+    })
+
+    return bins
+  }
+
+  let frame
+
+  const draw = () => {
+    const w = c.width / scale
+    const h = c.height / scale
+
+    r.clearRect(0,0,w,h)
+
+    getBins().forEach((v, i) => {
+      const x = i
+      const y = h - 1 - v
+
+      r.fillRect(x,y,1,1)
+    })
+
+    frame = requestAnimationFrame(draw)
+  }
+
+
+  fetch('mk_drmz.wav')
+  .then(response => response.arrayBuffer())
+  .then(arrayBuffer => ac.decodeAudioData(arrayBuffer))
+  .then(audioBuffer => {
+    b.buffer = audioBuffer
+    b.loop = true
+    b.start()
+    draw()
+  })
+</script>
