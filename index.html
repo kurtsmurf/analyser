@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>analyser</title>
+</head>
+
+<body>
+  <canvas id='analyser'></canvas>
+  <script>
+    const ac = new AudioContext()
+    const b = ac.createBufferSource()
+    const a = ac.createAnalyser()
+    const d = new Uint8Array(900)
+
+    b.connect(a).connect(ac.destination)
+
+    const c = document.getElementById('analyser')
+    const r = c.getContext('2d')
+
+    c.width = window.innerWidth
+    c.height = window.innerHeight / 2
+
+    const draw = () => {
+      r.clearRect(0,0,c.width,c.height)
+
+      a.getByteFrequencyData(d)
+
+      d.forEach((v, i) => {
+        r.fillRect((i/d.length)*c.width, c.height - v - 4, 4,4)
+      })
+
+      requestAnimationFrame(draw)
+    }
+
+    fetch('mk_drmz.wav')
+    .then(response => response.arrayBuffer())
+    .then(arrayBuffer => ac.decodeAudioData(arrayBuffer))
+    .then(audioBuffer => {
+      b.buffer = audioBuffer
+      b.loop = true
+      b.start()
+      draw()
+    })
+  </script>
+</body>
+
+</html>
