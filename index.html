@@ -63,11 +63,14 @@
     const w = c.width / scale
     const h = c.height / scale
 
-    r.clearRect(0,0,w,h)
+    r.fillStyle = 'rgba(255,255,255,.2)'
+    r.fillRect(0,0,w,h)
 
     getBins().forEach((v, i) => {
+      r.fillStyle = `hsl(${v * 18 + 15},100%, 50%)`
+
       const x = i
-      const y = h - 1 - v
+      const y = h - v
 
       r.fillRect(x,y,1,1)
     })
