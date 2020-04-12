@@ -58,7 +58,6 @@ const drawRow = (rowValues, rowIndex) => {
 
 const render = () => {
   renderCtx.clearRect(0,0,999999,9999999)
-  rows.forEach(drawRow)
 
   for (let i = rows.length; i>0;i--) {
     drawRow(rows[i - 1], i - 1)
