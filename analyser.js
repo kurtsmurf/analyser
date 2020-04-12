@@ -5,10 +5,11 @@ analyser.fftSize = 64
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
-const scale = 8
-const numRows = 64
+const scale = 16
+const numRows = 16
+const depth = 32
 canvas.width = analyser.frequencyBinCount * 3 * scale
-canvas.height = (numRows + 32) * scale
+canvas.height = (numRows + depth) * scale
 renderCtx.scale(scale,scale)
 
 
@@ -40,20 +41,21 @@ const updateRows = () => {
 
 // pure
 const scaleBins = (bins) => {
-  return bins.map(binVal => binVal * (32/256))
+  return bins.map(binVal => binVal * (depth/256))
 }
 
 // output
 let frame
 
 const drawRow = (rowValues, rowIndex) => {
-  const hue = rowIndex * 4
-  renderCtx.fillStyle = `hsl(${hue},100%,50%)`
 
   const h = canvas.height / scale
   rowValues.forEach((v,i) => {
+    const hue = v * 8
+    renderCtx.fillStyle = `hsl(${hue},100%,50%)`
+  
     x = i + rowIndex
-    y = h - v - rowIndex
+    y = h - v - 1 - rowIndex
 
     renderCtx.fillRect(x,y,1,1)
   })
