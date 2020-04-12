@@ -5,23 +5,14 @@ analyser.fftSize = 64
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
-const scale = 16
-const numRows = 16
+const scale = 5
+const numRows = 32
 const depth = 32
-canvas.width = analyser.frequencyBinCount * 3 * scale
+canvas.width = (analyser.frequencyBinCount + numRows) * scale
 canvas.height = (numRows + depth) * scale
+renderCtx.lineCap = 'round'
+renderCtx.lineJoin = 'round'
 renderCtx.scale(scale,scale)
-
-
-fetch('mk_drmz.wav')
-.then(response => response.arrayBuffer())
-.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-.then(audioBuffer => {
-  bufSrc.buffer = audioBuffer
-  bufSrc.loop = true
-  bufSrc.connect(analyser)//.connect(audioContext.destination)
-  bufSrc.start()
-})
 
 // state
 const rows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
@@ -48,29 +39,46 @@ const scaleBins = (bins) => {
 let frame
 
 const drawRow = (rowValues, rowIndex) => {
-
   const h = canvas.height / scale
-  rowValues.forEach((v,i) => {
-    const hue = v * 8
-    renderCtx.fillStyle = `hsl(${hue},100%,50%)`
-  
-    x = i + rowIndex
-    y = h - v - 1 - rowIndex
+  const hue = rowIndex * 18
+  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
 
-    renderCtx.fillRect(x,y,1,1)
-  })
+  renderCtx.moveTo(rowIndex, h - rowValues[0])
+  renderCtx.beginPath()
+  for (let i = 1; i<rowValues.length;i++) {
+    const v = rowValues[i]
+    const x = i + rowIndex
+    const y = h - v - 1 - rowIndex
+
+    renderCtx.lineTo(x,y)
+  }
+  renderCtx.stroke()
 }
 
 const render = () => {
   renderCtx.clearRect(0,0,999999,9999999)
   rows.forEach(drawRow)
+
+  for (let i = rows.length; i>0;i--) {
+    drawRow(rows[i - 1], i - 1)
+  }
 }
 
 // act
+fetch('resonator_clip.wav')
+.then(response => response.arrayBuffer())
+.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+.then(audioBuffer => {
+  bufSrc.buffer = audioBuffer
+  bufSrc.loop = true
+  bufSrc.connect(analyser)//.connect(audioContext.destination)
+  bufSrc.start()
+  animate()
+})
+
 animate = () => {
   updateRows()
   render()
 
   frame = requestAnimationFrame(animate)
 }
-animate()
