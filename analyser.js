@@ -40,9 +40,9 @@ let frame
 
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
-  const hue = rowIndex * 18
+  const hue = (frame % 120 - rowIndex) * 3
   const lightness = rowIndex / numRows * 50 + 50
-  renderCtx.strokeStyle = `hsl(${hue},100%,${lightness}%)`
+  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
 
   renderCtx.moveTo(rowIndex, h - rowValues[0])
   renderCtx.beginPath()
