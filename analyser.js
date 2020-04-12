@@ -5,7 +5,7 @@ analyser.fftSize = 64
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
-const scale = 5
+const scale = 12
 const numRows = 32
 const depth = 32
 canvas.width = (analyser.frequencyBinCount + numRows) * scale
@@ -41,7 +41,8 @@ let frame
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
   const hue = rowIndex * 18
-  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
+  const lightness = rowIndex / numRows * 50 + 50
+  renderCtx.strokeStyle = `hsl(${hue},100%,${lightness}%)`
 
   renderCtx.moveTo(rowIndex, h - rowValues[0])
   renderCtx.beginPath()
@@ -65,7 +66,7 @@ const render = () => {
 }
 
 // act
-fetch('resonator_clip.wav')
+fetch('mk_drmz.wav')
 .then(response => response.arrayBuffer())
 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
 .then(audioBuffer => {
@@ -82,3 +83,8 @@ animate = () => {
 
   frame = requestAnimationFrame(animate)
 }
+
+// use web audio to schedule ticks
+// make color gradients from row values
+// sway left/right
+// fade out from front to back
