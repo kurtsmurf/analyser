@@ -61,9 +61,4 @@ fetch('mk_drmz.wav')
   b.loop = true
   b.start()
   draw()
-
-  setTimeout(() => {
-    b.stop()
-    cancelAnimationFrame(frame)
-  }, 1000)
 })
