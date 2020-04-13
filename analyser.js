@@ -40,22 +40,26 @@ let frame
 
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
-  const hue = (frame % 120 - rowIndex) * 3
-  const lightness = rowIndex / numRows * 50 + 50
-  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
+  const path = new Path2D()
+  path.moveTo(rowIndex + 1, h - rowValues[0] - 1 - rowIndex)
 
-  renderCtx.moveTo(rowIndex, h - rowValues[0])
-  renderCtx.beginPath()
   for (let i = 1; i<rowValues.length;i++) {
     const v = rowValues[i]
-    const x = i + rowIndex
+    const x = i + 1 + rowIndex
     const y = h - v - 1 - rowIndex
 
-    renderCtx.lineTo(x,y)
+    path.lineTo(x,y)
   }
-  // renderCtx.fill()
-  renderCtx.stroke()
 
+  const hue = (frame % 120 - rowIndex) * 3
+
+  renderCtx.strokeStyle = `hsl(${hue},100%,85%)`
+  renderCtx.lineWidth = 2
+  renderCtx.stroke(path)
+
+  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
+  renderCtx.lineWidth = 1.5
+  renderCtx.stroke(path)
 }
 
 const drawFrame = () => {
@@ -88,4 +92,3 @@ animate = () => {
 // use web audio to schedule ticks
 // make color gradients from row values
 // sway left/right
-// fade out from front to back
