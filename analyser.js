@@ -5,7 +5,7 @@ analyser.fftSize = 64
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
-const scale = 12
+const scale = 16
 const numRows = 32
 const depth = 32
 canvas.width = (analyser.frequencyBinCount + numRows) * scale
@@ -53,11 +53,13 @@ const drawRow = (rowValues, rowIndex) => {
 
     renderCtx.lineTo(x,y)
   }
+  // renderCtx.fill()
   renderCtx.stroke()
+
 }
 
-const render = () => {
-  renderCtx.clearRect(0,0,999999,9999999)
+const drawFrame = () => {
+  renderCtx.clearRect(0,0,canvas.width,canvas.height)
 
   for (let i = rows.length; i>0;i--) {
     drawRow(rows[i - 1], i - 1)
@@ -78,7 +80,7 @@ fetch('mk_drmz.wav')
 
 animate = () => {
   updateRows()
-  render()
+  drawFrame()
 
   frame = requestAnimationFrame(animate)
 }
