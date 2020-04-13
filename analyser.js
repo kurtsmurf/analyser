@@ -1,64 +1,94 @@
-const ac = new AudioContext()
-const b = ac.createBufferSource()
-const a = ac.createAnalyser()
+const audioContext = new AudioContext()
+const bufSrc = audioContext.createBufferSource()
+const analyser = audioContext.createAnalyser()
+analyser.fftSize = 64
 
-b.connect(a).connect(ac.destination)
+const canvas = document.getElementById('analyser')
+const renderCtx = canvas.getContext('2d')
+const scale = 16
+const numRows = 32
+const depth = 32
+canvas.width = (analyser.frequencyBinCount + numRows) * scale
+canvas.height = (numRows + depth) * scale
+renderCtx.lineCap = 'round'
+renderCtx.lineJoin = 'round'
+renderCtx.scale(scale,scale)
 
-const c = document.getElementById('analyser')
-const r = c.getContext('2d')
+// state
+const rows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
 
-const binsPerRow = 32
-const rowCount = 8
-const scale = 10
+// input
+const getFreqData = () => {
+  const freqData = new Uint8Array(analyser.frequencyBinCount)
+  analyser.getByteFrequencyData(freqData)
 
-c.width = binsPerRow * scale
-c.height = 32 * scale
-
-r.scale(scale,scale)
-
-let bins = new Uint8Array(binsPerRow * rowCount)
-
-const getBins = () => {
-  const binWidth = a.frequencyBinCount / binsPerRow
-  const data = new Uint8Array(a.frequencyBinCount)
-
-  a.getByteFrequencyData(data)
-
-  bins.forEach((_, i) => {
-    bins[i] = Math.floor(data[binWidth * i] / 8)
-  })
-
-  return bins
+  return freqData
 }
 
+const updateRows = () => {
+  rows.unshift(scaleBins(getFreqData()))
+  rows.pop()
+}
+
+// pure
+const scaleBins = (bins) => {
+  return bins.map(binVal => binVal * (depth/256))
+}
+
+// output
 let frame
 
-const draw = () => {
-  const w = c.width / scale
-  const h = c.height / scale
+const drawRow = (rowValues, rowIndex) => {
+  const h = canvas.height / scale
+  const path = new Path2D()
+  path.moveTo(rowIndex + 1, h - rowValues[0] - 1 - rowIndex)
 
-  r.fillStyle = 'rgba(255,255,255,.2)'
-  r.fillRect(0,0,w,h)
+  for (let i = 1; i<rowValues.length;i++) {
+    const v = rowValues[i]
+    const x = i + 1 + rowIndex
+    const y = h - v - 1 - rowIndex
 
-  getBins().forEach((v, i) => {
-    r.fillStyle = `hsl(${v * 18 + 15},100%, 50%)`
+    path.lineTo(x,y)
+  }
 
-    const x = i
-    const y = h - v
+  const hue = (frame % 120 - rowIndex) * 3
 
-    r.fillRect(x,y,1,1)
-  })
+  renderCtx.strokeStyle = `hsl(${hue},100%,85%)`
+  renderCtx.lineWidth = 2
+  renderCtx.stroke(path)
 
-  frame = requestAnimationFrame(draw)
+  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
+  renderCtx.lineWidth = 1.5
+  renderCtx.stroke(path)
 }
 
+const drawFrame = () => {
+  renderCtx.clearRect(0,0,canvas.width,canvas.height)
 
+  for (let i = rows.length; i>0;i--) {
+    drawRow(rows[i - 1], i - 1)
+  }
+}
+
+// act
 fetch('mk_drmz.wav')
 .then(response => response.arrayBuffer())
-.then(arrayBuffer => ac.decodeAudioData(arrayBuffer))
+.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
 .then(audioBuffer => {
-  b.buffer = audioBuffer
-  b.loop = true
-  b.start()
-  draw()
+  bufSrc.buffer = audioBuffer
+  bufSrc.loop = true
+  bufSrc.connect(analyser)//.connect(audioContext.destination)
+  bufSrc.start()
+  animate()
 })
+
+animate = () => {
+  updateRows()
+  drawFrame()
+
+  frame = requestAnimationFrame(animate)
+}
+
+// use web audio to schedule ticks
+// make color gradients from row values
+// sway left/right
