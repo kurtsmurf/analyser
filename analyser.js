@@ -60,18 +60,19 @@ const drawRow = (rowValues, rowIndex) => {
   const top = bottom - depth
   const gradientOuter = renderCtx.createLinearGradient(0,bottom,0,top)
 
-  gradientOuter.addColorStop(0, `hsl(${hue},${saturation}%,75%)`)
-  gradientOuter.addColorStop(1, `hsl(${hue + 90},${saturation}%,85%)`)
-
+  gradientOuter.addColorStop(0, `hsl(${hue},${saturation}%,85%)`)
+  gradientOuter.addColorStop(.5, `hsl(${hue + 90},${saturation}%,85%)`)
+  gradientOuter.addColorStop(1, `hsl(${hue + 180},${saturation}%,85%)`)
+  
   renderCtx.strokeStyle = gradientOuter
   renderCtx.lineWidth = 2
   renderCtx.stroke(path)
 
   const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
 
-  gradient.addColorStop(0, `hsl(${hue},${saturation}%,40%)`)
-  gradient.addColorStop(1, `hsl(${hue + 90},${saturation}%,50%)`)
-
+  gradient.addColorStop(0, `hsl(${hue},${saturation}%,50%)`)
+  gradient.addColorStop(.5, `hsl(${hue + 90},${saturation}%,50%)`)
+  gradient.addColorStop(1, `hsl(${hue + 180},${saturation}%,50%)`)
 
   renderCtx.strokeStyle = gradient
   renderCtx.lineWidth = 1.5
