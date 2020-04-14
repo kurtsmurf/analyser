@@ -52,7 +52,7 @@ const drawRow = (rowValues, rowIndex) => {
     path.lineTo(x,y)
   }
 
-  const hue = frame % 360
+  const hue = (frame % 1800) / 5
   const saturation = 125 - (rowIndex / numRows) * 100
 
 
