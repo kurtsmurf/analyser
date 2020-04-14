@@ -36,7 +36,7 @@ const scaleBins = (bins) => {
 }
 
 // output
-let frame
+let frame = 0
 
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
@@ -53,13 +53,27 @@ const drawRow = (rowValues, rowIndex) => {
   }
 
   const hue = frame % 360
-  const saturation = 100 - (rowIndex / numRows) * 100
+  const saturation = 125 - (rowIndex / numRows) * 100
 
-  renderCtx.strokeStyle = `hsl(${hue},${saturation}%,85%)`
+
+  const bottom = h - rowIndex
+  const top = bottom - depth
+  const gradientOuter = renderCtx.createLinearGradient(0,bottom,0,top)
+
+  gradientOuter.addColorStop(0, `hsl(${hue},${saturation}%,75%)`)
+  gradientOuter.addColorStop(1, `hsl(${hue + 90},${saturation}%,85%)`)
+
+  renderCtx.strokeStyle = gradientOuter
   renderCtx.lineWidth = 2
   renderCtx.stroke(path)
 
-  renderCtx.strokeStyle = `hsl(${hue},${saturation}%,50%)`
+  const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
+
+  gradient.addColorStop(0, `hsl(${hue},${saturation}%,40%)`)
+  gradient.addColorStop(1, `hsl(${hue + 90},${saturation}%,50%)`)
+
+
+  renderCtx.strokeStyle = gradient
   renderCtx.lineWidth = 1.5
   renderCtx.stroke(path)
 }
