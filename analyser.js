@@ -40,6 +40,7 @@ let frame
 
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
+
   const path = new Path2D()
   path.moveTo(rowIndex + 1, h - rowValues[0] - 1 - rowIndex)
 
@@ -51,13 +52,14 @@ const drawRow = (rowValues, rowIndex) => {
     path.lineTo(x,y)
   }
 
-  const hue = (frame % 120 - rowIndex) * 3
+  const hue = frame % 360
+  const saturation = 100 - (rowIndex / numRows) * 100
 
-  renderCtx.strokeStyle = `hsl(${hue},100%,85%)`
+  renderCtx.strokeStyle = `hsl(${hue},${saturation}%,85%)`
   renderCtx.lineWidth = 2
   renderCtx.stroke(path)
 
-  renderCtx.strokeStyle = `hsl(${hue},100%,50%)`
+  renderCtx.strokeStyle = `hsl(${hue},${saturation}%,50%)`
   renderCtx.lineWidth = 1.5
   renderCtx.stroke(path)
 }
