@@ -96,16 +96,27 @@ const animate = () => {
 }
 
 // ======= ACT =======
-fetch('mk_drmz.wav')
-  .then(response => response.arrayBuffer())
-  .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-  .then(audioBuffer => {
-    bufSrc.buffer = audioBuffer
-    bufSrc.loop = true
-    bufSrc.connect(analyser)// .connect(audioContext.destination)
-    bufSrc.start()
-    animate()
-  })
+// fetch('mk_drmz.wav')
+//   .then(response => response.arrayBuffer())
+//   .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+//   .then(audioBuffer => {
+//     bufSrc.buffer = audioBuffer
+//     bufSrc.loop = true
+//     bufSrc.connect(analyser)// .connect(audioContext.destination)
+//     bufSrc.start()
+//     animate()
+//   })
+
+const handleSuccess = (stream) => {
+  const source = audioContext.createMediaStreamSource(stream)
+  source.connect(analyser)
+  audioContext.resume()
+}
+
+navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(handleSuccess);
+
+animate()
 
 // use web audio to schedule ticks
 // sway left/right
