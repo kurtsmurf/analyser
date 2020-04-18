@@ -37,8 +37,8 @@ const scaleBins = (bins) => {
   return bins.map(binVal => binVal * (depth/256))
 }
 
-const verticalGradient = (bottom, top, baseHue, saturation, lightness) => {
-  const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
+const verticalGradient = (baseHue, saturation, lightness) => {
+  const gradient = renderCtx.createLinearGradient(0,depth,0,0)
   gradient.addColorStop(0.0, `hsl(${baseHue},${saturation}%,${lightness}%)`)
   gradient.addColorStop(0.5, `hsl(${baseHue + 90},${saturation}%,${lightness}%)`)
   gradient.addColorStop(1.0, `hsl(${baseHue + 180},${saturation}%,${lightness}%)`)
@@ -66,11 +66,11 @@ const drawFreqData = (freqData, saturation) => {
   const path = pathFromFreqData(freqData)
   const baseHue = (frame % 1800) / 5
 
-  renderCtx.strokeStyle = verticalGradient(depth, 0, baseHue, saturation, 85)
+  renderCtx.strokeStyle = verticalGradient(baseHue, saturation, 85)
   renderCtx.lineWidth = lineWidth
   renderCtx.stroke(path)
 
-  renderCtx.strokeStyle = verticalGradient(depth, 0, baseHue, saturation, 50)
+  renderCtx.strokeStyle = verticalGradient(baseHue, saturation, 50)
   renderCtx.lineWidth = lineWidth * .75
   renderCtx.stroke(path)
 }
