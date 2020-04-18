@@ -35,8 +35,19 @@ const scaleBins = (bins) => {
   return bins.map(binVal => binVal * (depth/256))
 }
 
+const verticalGradient = (bottom, top, baseHue, saturation, lightness) => {
+  const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
+  gradient.addColorStop(0.0, `hsl(${baseHue},${saturation}%,${lightness}%)`)
+  gradient.addColorStop(0.5, `hsl(${baseHue + 90},${saturation}%,${lightness}%)`)
+  gradient.addColorStop(1.0, `hsl(${baseHue + 180},${saturation}%,${lightness}%)`)
+
+  return gradient
+}
+
 // output
 let frame = 0
+
+
 
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
@@ -54,32 +65,20 @@ const drawRow = (rowValues, rowIndex) => {
   }
 
   // calculate hue and saturation
-  const hue = (frame % 1800) / 5
+  const baseHue = (frame % 1800) / 5
   const saturation = 125 - (rowIndex / numRows) * 100
 
-  // calculate upper/lower bounds of frame box
+  // calculate upper/lower bounds of row box
   const bottom = h - rowIndex
   const top = bottom - depth
 
-  // create lighter color gradient object for thicker line
-  const gradientOuter = renderCtx.createLinearGradient(0,bottom,0,top)
-  gradientOuter.addColorStop(0, `hsl(${hue},${saturation}%,85%)`)
-  gradientOuter.addColorStop(.5, `hsl(${hue + 90},${saturation}%,85%)`)
-  gradientOuter.addColorStop(1, `hsl(${hue + 180},${saturation}%,85%)`)
-  
-  // draw thicker line
-  renderCtx.strokeStyle = gradientOuter
+  // draw wider line
+  renderCtx.strokeStyle = verticalGradient(bottom, top, baseHue, saturation, 85)
   renderCtx.lineWidth = 2
   renderCtx.stroke(path)
 
-  // create darker color gradient for thinner line
-  const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
-  gradient.addColorStop(0, `hsl(${hue},${saturation}%,50%)`)
-  gradient.addColorStop(.5, `hsl(${hue + 90},${saturation}%,50%)`)
-  gradient.addColorStop(1, `hsl(${hue + 180},${saturation}%,50%)`)
-
-  // draw thinner line
-  renderCtx.strokeStyle = gradient
+  // draw narrower line
+  renderCtx.strokeStyle = verticalGradient(bottom, top, baseHue, saturation, 50)
   renderCtx.lineWidth = 1.5
   renderCtx.stroke(path)
 }
