@@ -74,7 +74,7 @@ const drawFreqData = (freqData, saturation) => {
 }
 
 const drawFrame = () => {
-  const defaultTransform = renderCtx.getTransform()
+  const initialTransform = renderCtx.getTransform()
   renderCtx.clearRect(0, 0, canvas.width, canvas.height)
   renderCtx.translate(numRows + 1, -1)
 
@@ -85,7 +85,7 @@ const drawFrame = () => {
     drawFreqData(freqDataRows[i], saturation)
   }
 
-  renderCtx.setTransform(defaultTransform)
+  renderCtx.setTransform(initialTransform)
 }
 
 const animate = () => {
