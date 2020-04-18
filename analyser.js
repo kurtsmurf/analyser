@@ -34,14 +34,14 @@ const updateRows = () => {
 
 // ======= PURE =======
 const scaleBins = (bins) => {
-  return bins.map(binVal => binVal * (depth/256))
+  return bins.map(binVal => binVal * (depth / 256))
 }
 
 const verticalGradient = (baseHue, saturation, lightness) => {
-  const gradient = renderCtx.createLinearGradient(0,depth,0,0)
-  gradient.addColorStop(0.0, `hsl(${baseHue},${saturation}%,${lightness}%)`)
-  gradient.addColorStop(0.5, `hsl(${baseHue + 90},${saturation}%,${lightness}%)`)
-  gradient.addColorStop(1.0, `hsl(${baseHue + 180},${saturation}%,${lightness}%)`)
+  const gradient = renderCtx.createLinearGradient(0, depth, 0, 0)
+  gradient.addColorStop(0.0, `hsl(${baseHue      }, ${saturation}%, ${lightness}%)`)
+  gradient.addColorStop(0.5, `hsl(${baseHue + 90 }, ${saturation}%, ${lightness}%)`)
+  gradient.addColorStop(1.0, `hsl(${baseHue + 180}, ${saturation}%, ${lightness}%)`)
 
   return gradient
 }
@@ -50,10 +50,10 @@ const pathFromFreqData = (freqData) => {
   const path = new Path2D()
   path.moveTo(0, depth - freqData[0])
 
-  for (let i = 1; i<freqData.length;i++) {
+  for (let i = 1; i < freqData.length; i++) {
     const x = i
     const y = depth - freqData[i]
-    path.lineTo(x,y)
+    path.lineTo(x, y)
   }
 
   return path
@@ -71,13 +71,13 @@ const drawFreqData = (freqData, saturation) => {
   renderCtx.stroke(path)
 
   renderCtx.strokeStyle = verticalGradient(baseHue, saturation, 50)
-  renderCtx.lineWidth = lineWidth * .75
+  renderCtx.lineWidth = lineWidth * 0.75
   renderCtx.stroke(path)
 }
 
 const drawFrame = () => {
   const defaultTransform = renderCtx.getTransform()
-  renderCtx.clearRect(0,0,canvas.width,canvas.height)
+  renderCtx.clearRect(0, 0, canvas.width, canvas.height)
   renderCtx.translate(numRows, -1)
 
   for (let i = numRows - 1; i > 0; i--) {
@@ -99,16 +99,15 @@ const animate = () => {
 
 // ======= ACT =======
 fetch('mk_drmz.wav')
-.then(response => response.arrayBuffer())
-.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-.then(audioBuffer => {
-  bufSrc.buffer = audioBuffer
-  bufSrc.loop = true
-  bufSrc.connect(analyser)//.connect(audioContext.destination)
-  bufSrc.start()
-  animate()
-})  
-
+  .then(response => response.arrayBuffer())
+  .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+  .then(audioBuffer => {
+    bufSrc.buffer = audioBuffer
+    bufSrc.loop = true
+    bufSrc.connect(analyser)// .connect(audioContext.destination)
+    bufSrc.start()
+    animate()
+  })
 
 // use web audio to schedule ticks
 // sway left/right
