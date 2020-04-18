@@ -14,6 +14,8 @@ renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
 renderCtx.scale(scale, scale)
 
+const lineWidth = 2
+
 // ======= STATE =======
 const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
 
@@ -60,18 +62,14 @@ const pathFromFreqData = (freqData) => {
 // ======= OUTPUT =======
 let frame = 0
 
-const drawFreqData = (freqData, lineWidth, saturation) => {
+const drawFreqData = (freqData, saturation) => {
   const path = pathFromFreqData(freqData)
-
-  // let overall hue drift over time
   const baseHue = (frame % 1800) / 5
 
-  // draw wider line
   renderCtx.strokeStyle = verticalGradient(depth, 0, baseHue, saturation, 85)
   renderCtx.lineWidth = lineWidth
   renderCtx.stroke(path)
 
-  // draw narrower line
   renderCtx.strokeStyle = verticalGradient(depth, 0, baseHue, saturation, 50)
   renderCtx.lineWidth = lineWidth * .75
   renderCtx.stroke(path)
@@ -86,7 +84,7 @@ const drawFrame = () => {
     const saturation = 125 - (i / numRows) * 100
     renderCtx.translate(-1, 1)
 
-    drawFreqData(freqDataRows[i], 2, saturation)
+    drawFreqData(freqDataRows[i], saturation)
   }
 
   renderCtx.setTransform(defaultTransform)
