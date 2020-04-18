@@ -41,6 +41,7 @@ let frame = 0
 const drawRow = (rowValues, rowIndex) => {
   const h = canvas.height / scale
 
+  // create path object from frequency data
   const path = new Path2D()
   path.moveTo(rowIndex + 1, h - rowValues[0] - 1 - rowIndex)
 
@@ -52,28 +53,32 @@ const drawRow = (rowValues, rowIndex) => {
     path.lineTo(x,y)
   }
 
+  // calculate hue and saturation
   const hue = (frame % 1800) / 5
   const saturation = 125 - (rowIndex / numRows) * 100
 
-
+  // calculate upper/lower bounds of frame box
   const bottom = h - rowIndex
   const top = bottom - depth
-  const gradientOuter = renderCtx.createLinearGradient(0,bottom,0,top)
 
+  // create lighter color gradient object for thicker line
+  const gradientOuter = renderCtx.createLinearGradient(0,bottom,0,top)
   gradientOuter.addColorStop(0, `hsl(${hue},${saturation}%,85%)`)
   gradientOuter.addColorStop(.5, `hsl(${hue + 90},${saturation}%,85%)`)
   gradientOuter.addColorStop(1, `hsl(${hue + 180},${saturation}%,85%)`)
   
+  // draw thicker line
   renderCtx.strokeStyle = gradientOuter
   renderCtx.lineWidth = 2
   renderCtx.stroke(path)
 
+  // create darker color gradient for thinner line
   const gradient = renderCtx.createLinearGradient(0,bottom,0,top)
-
   gradient.addColorStop(0, `hsl(${hue},${saturation}%,50%)`)
   gradient.addColorStop(.5, `hsl(${hue + 90},${saturation}%,50%)`)
   gradient.addColorStop(1, `hsl(${hue + 180},${saturation}%,50%)`)
 
+  // draw thinner line
   renderCtx.strokeStyle = gradient
   renderCtx.lineWidth = 1.5
   renderCtx.stroke(path)
@@ -87,6 +92,13 @@ const drawFrame = () => {
   }
 }
 
+const animate = () => {
+  updateRows()
+  drawFrame()
+
+  frame = requestAnimationFrame(animate)
+}
+
 // act
 fetch('mk_drmz.wav')
 .then(response => response.arrayBuffer())
@@ -97,14 +109,8 @@ fetch('mk_drmz.wav')
   bufSrc.connect(analyser)//.connect(audioContext.destination)
   bufSrc.start()
   animate()
-})
+})  
 
-animate = () => {
-  updateRows()
-  drawFrame()
-
-  frame = requestAnimationFrame(animate)
-}
 
 // use web audio to schedule ticks
 // make color gradients from row values
