@@ -9,15 +9,15 @@ const scale = 16
 const numRows = 32
 const depth = 32
 canvas.width = (analyser.frequencyBinCount + numRows - 1) * scale
-canvas.height = (numRows + depth - 1) * scale
+canvas.height = (numRows - 1 + depth) * scale
 renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
-renderCtx.scale(scale,scale)
+renderCtx.scale(scale, scale)
 
-// state
+// ======= STATE =======
 const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
 
-// input
+// ======= INPUT =======
 const getFreqData = () => {
   const freqData = new Uint8Array(analyser.frequencyBinCount)
   analyser.getByteFrequencyData(freqData)
@@ -30,7 +30,7 @@ const updateRows = () => {
   freqDataRows.pop()
 }
 
-// pure
+// ======= PURE =======
 const scaleBins = (bins) => {
   return bins.map(binVal => binVal * (depth/256))
 }
@@ -46,24 +46,21 @@ const verticalGradient = (bottom, top, baseHue, saturation, lightness) => {
 
 const pathFromFreqData = (freqData) => {
   const path = new Path2D()
-
   path.moveTo(0, depth - freqData[0])
 
   for (let i = 1; i<freqData.length;i++) {
     const x = i
     const y = depth - freqData[i]
-
     path.lineTo(x,y)
   }
 
   return path
 }
 
-// output
+// ======= OUTPUT =======
 let frame = 0
 
 const drawFreqData = (freqData, lineWidth, saturation) => {
-  // create path object from frequency data
   const path = pathFromFreqData(freqData)
 
   // let overall hue drift over time
@@ -78,33 +75,20 @@ const drawFreqData = (freqData, lineWidth, saturation) => {
   renderCtx.strokeStyle = verticalGradient(depth, 0, baseHue, saturation, 50)
   renderCtx.lineWidth = lineWidth * .75
   renderCtx.stroke(path)
-
-  // temp - draw guide
-  renderCtx.strokeStyle = 'white'
-  renderCtx.lineWidth = .125
-  renderCtx.strokeRect(0,1,freqData.length - 1,depth - 1)
 }
 
 const drawFrame = () => {
-  // save default transform
   const defaultTransform = renderCtx.getTransform()
-  
   renderCtx.clearRect(0,0,canvas.width,canvas.height)
-
-  // move origin to initial position
   renderCtx.translate(numRows, -1)
 
-  // draw data rows back to front
   for (let i = numRows - 1; i > 0; i--) {
-    // update origin
-    renderCtx.translate(-1, 1)
-
     const saturation = 125 - (i / numRows) * 100
+    renderCtx.translate(-1, 1)
 
     drawFreqData(freqDataRows[i], 2, saturation)
   }
 
-  // restore default transform
   renderCtx.setTransform(defaultTransform)
 }
 
@@ -115,7 +99,7 @@ const animate = () => {
   frame = requestAnimationFrame(animate)
 }
 
-// act
+// ======= ACT =======
 fetch('mk_drmz.wav')
 .then(response => response.arrayBuffer())
 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
@@ -129,5 +113,4 @@ fetch('mk_drmz.wav')
 
 
 // use web audio to schedule ticks
-// make color gradients from row values
 // sway left/right
