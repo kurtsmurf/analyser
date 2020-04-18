@@ -25,9 +25,9 @@ const getFreqData = () => {
   return freqData
 }
 
-const updateRows = () => {
-  freqDataRows.unshift(scaleBins(getFreqData()))
-  freqDataRows.pop()
+const updateRows = () => {  
+  freqDataRows.push(scaleBins(getFreqData()))
+  freqDataRows.shift()
 }
 
 // ======= PURE =======
@@ -76,13 +76,12 @@ const drawFreqData = (freqData, saturation) => {
 const drawFrame = () => {
   const initialTransform = renderCtx.getTransform()
   renderCtx.clearRect(0, 0, canvas.width, canvas.height)
-  renderCtx.translate(numRows + 1, -1)
+  renderCtx.translate(numRows, 0)
 
-  for (let i = numRows - 1; i >= 0; i--) {
-    const saturation = 125 - (i / numRows) * 100
-    renderCtx.translate(-1, 1)
-
+  for (let i = 0; i < numRows; i++) {
+    const saturation = (i / numRows) * 100 + 25
     drawFreqData(freqDataRows[i], saturation)
+    renderCtx.translate(-1, 1)
   }
 
   renderCtx.setTransform(initialTransform)
