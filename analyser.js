@@ -8,15 +8,13 @@ const renderCtx = canvas.getContext('2d')
 const scale = 16
 const numRows = 32
 const depth = 32
-canvas.width = (analyser.frequencyBinCount + numRows - 1) * scale
-canvas.height = (numRows - 1 + depth) * scale
+const lineWidth = 2
+canvas.width = (analyser.frequencyBinCount + numRows) * scale
+canvas.height = (numRows + depth) * scale
 renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
 renderCtx.scale(scale, scale)
 
-const lineWidth = 2
-
-// ======= STATE =======
 const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
 
 // ======= INPUT =======
@@ -78,9 +76,9 @@ const drawFreqData = (freqData, saturation) => {
 const drawFrame = () => {
   const defaultTransform = renderCtx.getTransform()
   renderCtx.clearRect(0, 0, canvas.width, canvas.height)
-  renderCtx.translate(numRows, -1)
+  renderCtx.translate(numRows + 1, -1)
 
-  for (let i = numRows - 1; i > 0; i--) {
+  for (let i = numRows - 1; i >= 0; i--) {
     const saturation = 125 - (i / numRows) * 100
     renderCtx.translate(-1, 1)
 
