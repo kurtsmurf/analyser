@@ -44,14 +44,9 @@ const verticalGradient = (bottom, top, baseHue, saturation, lightness) => {
   return gradient
 }
 
-// output
-let frame = 0
-
-
-
-const drawFreqData = (freqData, lineWidth, saturation) => {
-  // create path object from frequency data
+const pathFromFreqData = (freqData) => {
   const path = new Path2D()
+
   path.moveTo(0, depth - freqData[0])
 
   for (let i = 1; i<freqData.length;i++) {
@@ -60,6 +55,16 @@ const drawFreqData = (freqData, lineWidth, saturation) => {
 
     path.lineTo(x,y)
   }
+
+  return path
+}
+
+// output
+let frame = 0
+
+const drawFreqData = (freqData, lineWidth, saturation) => {
+  // create path object from frequency data
+  const path = pathFromFreqData(freqData)
 
   // let overall hue drift over time
   const baseHue = (frame % 1800) / 5
