@@ -49,9 +49,7 @@ const pathFromFreqData = (freqData) => {
   path.moveTo(0, depth - freqData[0])
 
   for (let i = 1; i < freqData.length; i++) {
-    const x = i
-    const y = depth - freqData[i]
-    path.lineTo(x, y)
+    path.lineTo(i, depth - freqData[i])
   }
 
   return path
@@ -95,25 +93,13 @@ const animate = () => {
 }
 
 // ======= ACT =======
-// fetch('mk_drmz.wav')
-//   .then(response => response.arrayBuffer())
-//   .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-//   .then(audioBuffer => {
-//     bufSrc.buffer = audioBuffer
-//     bufSrc.loop = true
-//     bufSrc.connect(analyser)// .connect(audioContext.destination)
-//     bufSrc.start()
-//     animate()
-//   })
-
-const handleSuccess = (stream) => {
-  const source = audioContext.createMediaStreamSource(stream)
-  source.connect(analyser)
-  audioContext.resume()
-}
-
-navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-    .then(handleSuccess);
+navigator.mediaDevices
+  .getUserMedia({ audio: true, video: false })
+  .then(stream => {
+    const source = audioContext.createMediaStreamSource(stream)
+    source.connect(analyser)
+    audioContext.resume()
+  })
 
 animate()
 
