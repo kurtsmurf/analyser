@@ -1,16 +1,18 @@
 const audioContext = new AudioContext()
 const bufSrc = audioContext.createBufferSource()
 const analyser = audioContext.createAnalyser()
+
 analyser.fftSize = 64
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
-const scale = 16
+const scale = 8
 const numRows = 32
-const depth = 32
+const boxHeight = 32
 const lineWidth = 2
+
 canvas.width = (analyser.frequencyBinCount + numRows) * scale
-canvas.height = (numRows + depth) * scale
+canvas.height = (numRows + boxHeight) * scale
 renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
 renderCtx.scale(scale, scale)
@@ -32,11 +34,11 @@ const updateRows = () => {
 
 // ======= PURE =======
 const scaleBins = (bins) => {
-  return bins.map(binVal => binVal * (depth / 256))
+  return bins.map(binVal => binVal * (boxHeight / 255))
 }
 
 const verticalGradient = (baseHue, saturation, lightness) => {
-  const gradient = renderCtx.createLinearGradient(0, depth, 0, 0)
+  const gradient = renderCtx.createLinearGradient(0, boxHeight, 0, 0)
   gradient.addColorStop(0.0, `hsl(${baseHue      }, ${saturation}%, ${lightness}%)`)
   gradient.addColorStop(0.5, `hsl(${baseHue + 90 }, ${saturation}%, ${lightness}%)`)
   gradient.addColorStop(1.0, `hsl(${baseHue + 180}, ${saturation}%, ${lightness}%)`)
@@ -46,10 +48,10 @@ const verticalGradient = (baseHue, saturation, lightness) => {
 
 const pathFromFreqData = (freqData) => {
   const path = new Path2D()
-  path.moveTo(0, depth - freqData[0])
+  path.moveTo(0, boxHeight - freqData[0])
 
   for (let i = 1; i < freqData.length; i++) {
-    path.lineTo(i, depth - freqData[i])
+    path.lineTo(i, boxHeight - freqData[i])
   }
 
   return path
