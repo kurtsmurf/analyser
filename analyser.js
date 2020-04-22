@@ -34,7 +34,7 @@ const updateRows = () => {
 
 // ======= PURE =======
 const scaleBins = (bins) => {
-  return bins.map(binVal => binVal * (boxHeight / 255))
+  return bins.map(binVal => binVal * (boxHeight / 256))
 }
 
 const verticalGradient = (baseHue, saturation, lightness) => {
@@ -94,15 +94,33 @@ const animate = () => {
   frame = requestAnimationFrame(animate)
 }
 
+let streamSource
+
 // ======= ACT =======
 navigator.mediaDevices
   .getUserMedia({ audio: true, video: false })
   .then(stream => {
-    const source = audioContext.createMediaStreamSource(stream)
-    source.connect(analyser)
+    streamSource = audioContext.createMediaStreamSource(stream)
+    streamSource.connect(analyser)
     audioContext.resume()
   })
 
 animate()
+
+const demo = () => {
+  const osc = audioContext.createOscillator()
+  const oscGain = audioContext.createGain()
+  osc.frequency.value = 11000
+  oscGain.gain.value = 0.3
+  osc.connect(oscGain).connect(analyser)
+  osc.start()
+  
+  const lfo = audioContext.createOscillator()
+  const lfoGain = audioContext.createGain()
+  lfo.frequency.value = 0.25
+  lfoGain.gain.value = 10000
+  lfo.connect(lfoGain).connect(osc.frequency)
+  lfo.start()
+}
 
 // use web audio to schedule ticks
