@@ -106,4 +106,3 @@ navigator.mediaDevices
 animate()
 
 // use web audio to schedule ticks
-// sway left/right
