@@ -9,6 +9,13 @@ const renderCtx = canvas.getContext('2d')
 const scale = 8
 const numRows = 32
 const boxHeight = 32
+const lineWidth = 2
+
+canvas.width = (analyser.frequencyBinCount + numRows) * scale
+canvas.height = (numRows + boxHeight) * scale
+renderCtx.lineCap = 'round'
+renderCtx.lineJoin = 'round'
+renderCtx.scale(scale, scale)
 
 const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
 
@@ -51,44 +58,11 @@ const pathFromFreqData = (freqData) => {
 }
 
 // ======= OUTPUT =======
-
-const cnvsPrefWidth = (analyser.frequencyBinCount + numRows) * scale
-const cnvsPrefHeight = (numRows + boxHeight) * scale
-const cnvsPadding = 12
-
-let xOffset
-
-const resize = () => {
-  if (window.innerWidth < cnvsPrefWidth + 64) {
-    canvas.classList.remove('border')
-  } else {
-    canvas.classList.add('border')
-  }
-
-  const limit = window.innerWidth - cnvsPadding * 2
-
-  canvas.width = Math.min(cnvsPrefWidth, limit)
-  canvas.height = (numRows + boxHeight) * scale
-  renderCtx.lineCap = 'round'
-  renderCtx.lineJoin = 'round'
-  renderCtx.scale(scale, scale)
-  
-  xOffset = Math.max(
-    ((canvas.width / scale) - numRows - 1) / (numRows - 1),
-    0
-  )
-}
-resize()
-
-window.onresize = resize
-window.onorientationchange = resize
-
 let frame = 0
 
 const drawFreqData = (freqData, saturation) => {
   const path = pathFromFreqData(freqData)
   const baseHue = (frame % 1800) / 5
-  const lineWidth = 2
 
   renderCtx.strokeStyle = verticalGradient(baseHue, saturation, 85)
   renderCtx.lineWidth = lineWidth
@@ -102,12 +76,12 @@ const drawFreqData = (freqData, saturation) => {
 const drawFrame = () => {
   const initialTransform = renderCtx.getTransform()
   renderCtx.clearRect(0, 0, canvas.width, canvas.height)
-  renderCtx.translate((numRows - 1) * xOffset + 1, 0)
+  renderCtx.translate(numRows, 0)
 
   for (let i = 0; i < numRows; i++) {
     const saturation = (i / numRows) * 100 + 25
     drawFreqData(freqDataRows[i], saturation)
-    renderCtx.translate(-1 * xOffset, 1)
+    renderCtx.translate(-1, 1)
   }
 
   renderCtx.setTransform(initialTransform)
