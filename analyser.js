@@ -9,11 +9,11 @@ const renderCtx = canvas.getContext('2d')
 const scale = 8
 const numRows = 32
 const boxHeight = 32
-const lineWidth = 2
+const lineWidth = 3
 const rowWidth = analyser.frequencyBinCount / 4
 
-canvas.width = (rowWidth + numRows) * scale
-canvas.height = (numRows + boxHeight) * scale
+canvas.width = (rowWidth + numRows + lineWidth) * scale
+canvas.height = (numRows + boxHeight + lineWidth) * scale
 renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
 renderCtx.scale(scale, scale)
@@ -77,7 +77,7 @@ const drawFreqData = (freqData, saturation) => {
 const drawFrame = () => {
   const initialTransform = renderCtx.getTransform()
   renderCtx.clearRect(0, 0, canvas.width, canvas.height)
-  renderCtx.translate(numRows, 0)
+  renderCtx.translate(numRows + lineWidth / 2, lineWidth / 2)
 
   for (let i = 0; i < numRows; i++) {
     const saturation = (i / numRows) * 100 + 25
@@ -111,7 +111,7 @@ animate()
 const demo = () => {
   const osc = audioContext.createOscillator()
   const oscGain = audioContext.createGain()
-  osc.frequency.value = 11000
+  osc.frequency.value = 3000
   oscGain.gain.value = 0.3
   osc.connect(oscGain).connect(analyser)
   osc.start()
@@ -119,7 +119,7 @@ const demo = () => {
   const lfo = audioContext.createOscillator()
   const lfoGain = audioContext.createGain()
   lfo.frequency.value = 0.25
-  lfoGain.gain.value = 10000
+  lfoGain.gain.value = 3000
   lfo.connect(lfoGain).connect(osc.frequency)
   lfo.start()
 }
