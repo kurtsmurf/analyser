@@ -2,7 +2,7 @@ const audioContext = new AudioContext()
 const bufSrc = audioContext.createBufferSource()
 const analyser = audioContext.createAnalyser()
 
-analyser.fftSize = 64
+analyser.fftSize = 256
 
 const canvas = document.getElementById('analyser')
 const renderCtx = canvas.getContext('2d')
@@ -10,18 +10,19 @@ const scale = 8
 const numRows = 32
 const boxHeight = 32
 const lineWidth = 2
+const rowWidth = analyser.frequencyBinCount / 4
 
-canvas.width = (analyser.frequencyBinCount + numRows) * scale
+canvas.width = (rowWidth + numRows) * scale
 canvas.height = (numRows + boxHeight) * scale
 renderCtx.lineCap = 'round'
 renderCtx.lineJoin = 'round'
 renderCtx.scale(scale, scale)
 
-const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(analyser.frequencyBinCount))
+const freqDataRows = [...Array(numRows)].map(_ => new Uint8Array(rowWidth))
 
 // ======= INPUT =======
 const getFreqData = () => {
-  const freqData = new Uint8Array(analyser.frequencyBinCount)
+  const freqData = new Uint8Array(rowWidth)
   analyser.getByteFrequencyData(freqData)
 
   return freqData
