@@ -124,4 +124,20 @@ const demo = () => {
   lfo.start()
 }
 
+let bufferSource
+
+const connectFile = fileName => {
+  fetch(fileName)
+    .then(response => response.arrayBuffer())
+    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+    .then(audioBuffer => {
+      bufferSource = audioContext.createBufferSource()
+      bufferSource.buffer = audioBuffer
+      bufferSource.loop = true
+      bufferSource.start()
+      bufferSource.connect(analyser).connect(audioContext.destination)
+    })
+}
+
+
 // use web audio to schedule ticks
