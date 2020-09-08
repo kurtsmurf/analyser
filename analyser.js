@@ -95,9 +95,9 @@ const animate = () => {
   frame = requestAnimationFrame(animate)
 }
 
+// ======= ACT =======
 let streamSource
 
-// ======= ACT =======
 navigator.mediaDevices
   .getUserMedia({ audio: true, video: false })
   .then(stream => {
@@ -135,7 +135,12 @@ const connectFile = fileName => {
       bufferSource.buffer = audioBuffer
       bufferSource.loop = true
       bufferSource.start()
-      bufferSource.connect(analyser).connect(audioContext.destination)
+      bufferSource.connect(analyser)
+      
+      const cut = audioContext.createGain()
+      cut.gain = 0.001
+
+      bufferSource.connect(cut).connect(audioContext.destination)
     })
 }
 
