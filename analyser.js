@@ -108,6 +108,7 @@ navigator.mediaDevices
 
 animate()
 
+// ======= EXTRAS =======
 const demo = () => {
   const osc = audioContext.createOscillator()
   const oscGain = audioContext.createGain()
